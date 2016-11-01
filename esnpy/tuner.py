@@ -3,7 +3,12 @@ import numpy as np
 from scipy import linalg
 
 
-class SpectralRadiusSetter():
+class ReservoirTuner():
+    def tune(self, reservoir):
+        raise NotImplementedError()
+
+
+class SpectralRadiusSetter(ReservoirTuner):
     def __init__(self, rho_objectif):
         self._rho = rho_objectif
 
@@ -12,20 +17,11 @@ class SpectralRadiusSetter():
         reservoir._W *= self._rho / rho_max
 
 
-class RemoveInputBias():
+class RemoveInputBias(ReservoirTuner):
     def tune(self, reservoir):
         reservoir._Win[0, :] = np.zeros(reservoir._W[0, :].shape)
 
 
-class UniformDenseInit():
-    def __init__(self, bmin, bmax):
-        self._min = bmin
-        self._max = bmax
-
-    def init(self, srow, scol):
-        return np.random.rand(srow, scol)*(self._max-self._min) + self._min
-
-
 #TODO: implements "improving reservoir with intrisic plasticity", Schrauwen
-class IntrisicPlasitictyLearner():
+class IntrisicPlasiticty(ReservoirTuner):
     pass
