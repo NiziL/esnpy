@@ -3,7 +3,8 @@ import numpy as np
 from scipy import linalg
 
 
-#TODO handle feedback, save and load from file
+#TODO handle feedback
+#TODO save and load from file
 class Reservoir():
 
     def __init__(self, Win, W, leaky, activation):
@@ -35,12 +36,6 @@ class Reservoir():
     @property
     def state(self):
         return self._x
-
-    def save(self):
-        pass
-
-    def load(self, path):
-        pass
 
     def update(self, input_vector):
         self._u = input_vector
@@ -148,24 +143,28 @@ class BatchTraining():
             self._mem[i, :] = np.hstack((1, u, self._reservoir.state))
 
     def create_readout(self, trainer, target):
-        size = int('bias' in trainer.input_list)
-        if 'input' in trainer.input_list:
-            size += self._reservoir.in_size
-        if 'reservoir' in trainer.input_list:
-            size += self._reservoir.nn_size
+        size = 0
+        for i in trainer.input_list:
+            if i == 'bias':
+                size += 1
+            elif i == 'input':
+                size += self._reservoir.in_size
+            elif i == 'reservoir':
+                size += self._reservoir.nn_size
 
         mem = np.ones((target.shape[0], size))
         at = 0
         for i in trainer.input_list:
+            size = 0
             if i == 'bias':
                 size = 1
-                part = mem[:, :1]
+                part = self._mem[:, :1]
             elif i == 'input':
                 size = self._reservoir.in_size
-                part = mem[:, 1:1+size]
+                part = self._mem[:, 1:1+size]
             elif i == 'reservoir':
                 size = self._reservoir.nn_size
-                part = mem[:, 1+self._reservoir.in_size:]
+                part = self._mem[:, 1+self._reservoir.in_size:]
             mem[:, at:at+size] = part
             at += size
 

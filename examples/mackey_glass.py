@@ -21,7 +21,7 @@ def main():
 
     reservoir = builder.build()
 
-    print("Training the readout...")
+    print("Training...")
     esn = esnpy.ESN(reservoir)
     esn.batch_learning(batch_trainer.Ridge(1e-8),
                        transient_data = data[:100, None],
