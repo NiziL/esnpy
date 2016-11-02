@@ -30,7 +30,7 @@ class Ridge(BatchTrainer):
 
 class PseudoInv(BatchTrainer):
 
-    def __init__(self, _from):
+    def __init__(self, _from = ['bias', 'input', 'reservoir']):
         super(PseudoInv, self).__init__(_from)
 
     def compute_output_w(self, mem, target):
@@ -39,7 +39,7 @@ class PseudoInv(BatchTrainer):
 
 class SklearnReg(BatchTrainer):
 
-    def __init__(self, _from, regression_model):
+    def __init__(self, regression_model, _from = ['bias', 'input', 'reservoir']):
         super(SklearnReg, self).__init__(_from)
         self._reg = regression_model
 

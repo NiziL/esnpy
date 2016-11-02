@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from scipy import linalg
+from scipy.sparse import linalg
 
 
 class ReservoirTuner():
@@ -9,11 +9,13 @@ class ReservoirTuner():
 
 
 class SpectralRadiusSetter(ReservoirTuner):
-    def __init__(self, rho_objectif):
+    def __init__(self, rho_objectif, k=6):
         self._rho = rho_objectif
+        self._k = k
 
     def tune(self, reservoir):
-        rho_max = np.max(np.abs(linalg.eig(reservoir._W)[0]))
+        #rho_max = np.max(np.abs(linalg.eig(reservoir._W)[0]))
+        rho_max = np.max(np.abs(linalg.eigs(reservoir._W, k=self._k)[0]))
         reservoir._W *= self._rho / rho_max
 
 

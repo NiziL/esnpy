@@ -16,7 +16,7 @@ def main():
            .set_input_size(1)\
            .set_input_init(init.UniformDenseInit(-0.5, 0.5))\
            .set_intern_size(1000)\
-           .set_intern_init(init.UniformDenseInit(-0.5, 0.5))\
+           .set_intern_init(init.UniformSparseInit(-0.5, 0.5, 0.01))\
            .add_tuner(tuner.SpectralRadiusSetter(1.25))\
 
     reservoir = builder.build()

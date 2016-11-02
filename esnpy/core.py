@@ -44,9 +44,9 @@ class Reservoir():
 
     def update(self, input_vector):
         self._u = input_vector
-        self._x = (1-self._a)*self._x +\
-                  self._a*self._f(np.dot(np.hstack((1, self._u)), self._Win) +\
-                                  np.dot(self._x, self._W))
+        u = np.hstack((1, input_vector))
+        self._x = (1-self._a) * self._x + self._a * \
+                  self._f(u.dot(self._Win) + self._W.dot(self._x))
 
     def warm_up(self, data):
         for u in data:
