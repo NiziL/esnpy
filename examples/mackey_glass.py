@@ -20,13 +20,14 @@ def main():
            .add_tuner(tuner.SpectralRadiusSetter(1.25))\
 
     reservoir = builder.build()
+    esn = esnpy.ESN(reservoir)
 
     print("Training...")
-    esn = esnpy.ESN(reservoir)
-    esn.batch_learning(batch_trainer.Ridge(1e-8),
-                       transient_data = data[:100, None],
-                       learning_data = data[100:2000, None],
-                       target = data[101:2001, None])
+    training = esnpy.BatchTraining()
+    training.train(esn, batch_trainer.Ridge(1e-8),
+                   transient_data = data[:100, None],
+                   learning_data = data[100:2000, None],
+                   target = data[101:2001, None])
 
     print("Testing...")
     err = np.zeros((1, 500))

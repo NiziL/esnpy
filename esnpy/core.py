@@ -1,10 +1,35 @@
 # -*- coding: utf-8 -*-
-import numpy as np
-from scipy import linalg
-
-
+############### ROADMAP ###############
 #TODO handle feedback
 #TODO save and load from file
+#######################################
+import numpy as np
+
+
+class ESN():
+
+    def __init__(self, reservoir, readout=None):
+        self._reservoir = reservoir
+        self._readout = readout
+
+    def set_readout(self, readout):
+        self._readout = readout
+
+    def predict(self, input):
+        self._reservoir.update(input)
+        return self._readout.compute(self._reservoir)
+
+
+class _ReadoutLayer():
+
+    def __init__(self, Wout, _from = ['bias', 'input', 'reservoir']):
+        self._Wout = Wout
+        self._from = _from
+
+    def compute(self, reservoir):
+        return np.dot(self._Wout, np.hstack(map(reservoir.get, self._from)))
+
+
 class Reservoir():
 
     def __init__(self, Win, W, leaky, activation):
@@ -97,42 +122,57 @@ class ReservoirBuilder():
         return r
 
 
-class ESN():
+class Training():
 
-    def __init__(self, reservoir, readout=None):
-        self._reservoir = reservoir
-        self._readout = readout
-
-    def predict(self, input):
-        self._reservoir.update(input)
-        return self._readout.compute(self._reservoir)
-
-    def warm_up(self, data):
-        for i in range(data.shape[0]):
-            self._reservoir.update(data[i, :])
-
-    def batch_learning(self, trainer, transient_data, learning_data, target, _from=['bias', 'input', 'reservoir']):
-        self._reservoir.warm_up(transient_data)
-        training = BatchTraining(self._reservoir)
-        training.memorize(learning_data)
-        self._readout = training.create_readout(trainer, target)
+    def train(self, esn, trainer, transient_data, learning_data, target):
+        raise NotImplementedError()
 
 
-class ReadoutLayer():
+class BatchTraining(Training):
 
-    def __init__(self, Wout, _from = ['bias', 'input', 'reservoir']):
-        self._Wout = Wout
-        self._from = _from
+    def __init__(self):
+        self._session = None
 
-    def compute(self, reservoir):
-        return np.dot(self._Wout, np.hstack(map(reservoir.get, self._from)))
+    def train(self, esn, trainer, transient_data, learning_data, target):
+        r = self.sess(esn._reservoir)\
+                .transient(transient_data)\
+                .memorize(learning_data)\
+                .train_readout(trainer, target)\
+                .get_readout()
+        esn.set_readout(r)
+        return self
+    
+    def sess(self, reservoir):
+        return _BatchSession(reservoir)
 
 
-class BatchTraining():
+class _BatchSession():
 
     def __init__(self, reservoir):
         self._reservoir = reservoir
         self._mem = None
+        self._readouts = []
+        
+    def _get_mem_shrunk(self, what, size_only=False):
+        part = None
+        size = 0
+        if what == 'bias':
+            size = 1
+            part = self._mem[:, :1]
+        elif what == 'input':
+            size = self._reservoir.in_size
+            part = self._mem[:, 1:1+size]
+        elif what == 'reservoir':
+            size = self._reservoir.nn_size
+            part = self._mem[:, -size:]
+        if size_only:
+            return size
+        else:
+            return part, size
+
+    def transient(self, data):
+        self._reservoir.warm_up(data)
+        return self
 
     def memorize(self, data):
         size = self._reservoir.in_size + self._reservoir.nn_size +1
@@ -141,31 +181,22 @@ class BatchTraining():
             u = data[i, :]
             self._reservoir.update(u)
             self._mem[i, :] = np.hstack((1, u, self._reservoir.state))
+        return self
 
-    def create_readout(self, trainer, target):
+    def train_readout(self, trainer, target):
         size = 0
         for i in trainer.input_list:
-            if i == 'bias':
-                size += 1
-            elif i == 'input':
-                size += self._reservoir.in_size
-            elif i == 'reservoir':
-                size += self._reservoir.nn_size
-
+            size += self._get_mem_shrunk(i, size_only=True)
         mem = np.ones((target.shape[0], size))
         at = 0
         for i in trainer.input_list:
-            size = 0
-            if i == 'bias':
-                size = 1
-                part = self._mem[:, :1]
-            elif i == 'input':
-                size = self._reservoir.in_size
-                part = self._mem[:, 1:1+size]
-            elif i == 'reservoir':
-                size = self._reservoir.nn_size
-                part = self._mem[:, 1+self._reservoir.in_size:]
+            part, size = self._get_mem_shrunk(i)
             mem[:, at:at+size] = part
             at += size
+        self._readouts.append(_ReadoutLayer(trainer.compute_output_w(mem, target), trainer.input_list))
+        return self
 
-        return ReadoutLayer(trainer.compute_output_w(mem, target), trainer.input_list)
+    def get_readout(self):
+        if len(self._readouts) == 1:
+            return self._readouts[0]
+        return self._readouts
