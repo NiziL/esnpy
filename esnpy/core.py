@@ -16,14 +16,43 @@ class ESN():
         return self._readout.compute(self._reservoir)
 
 
-class _ReadoutLayer():
+class Readout():
 
-    def __init__(self, Wout, _from = ['bias', 'input', 'reservoir']):
-        self._Wout = Wout
+    def __init__(self, _from):
         self._from = _from
 
+    def _prepare_input(self, reservoir):
+        return np.hstack(map(reservoir.get, self._from))
+
     def compute(self, reservoir):
-        return np.dot(self._Wout, np.hstack(map(reservoir.get, self._from)))
+        u = self._prepare_input(reservoir)
+        return self._do_compute(u)
+
+    def _do_compute(self, u):
+        raise NotImplementedError()
+
+
+class BasicReadout(Readout):
+
+    def __init__(self, Wout, _from = ['bias', 'input', 'reservoir']):
+        super(BasicReadout, self).__init__(_from)
+        self._Wout = Wout
+
+    def _do_compute(self, u):
+        return self._Wout.dot(u)
+
+
+class SklearnReadout(Readout):
+    
+    def __init__(self, model, _from = ['bias', 'input', 'reservoir']):
+        super(SklearnReadout, self).__init__(_from)
+        self._model = model
+
+    def _prepare_input(self, reservoir):
+        return super(SklearnReadout, self)._prepare_input(reservoir).reshape(1, -1)
+
+    def _do_compute(self, u):
+        return self._model.predict(u)
 
 
 class Reservoir():

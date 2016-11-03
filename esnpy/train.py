@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from .core import _ReadoutLayer
 import numpy as np
 
 
@@ -15,7 +14,7 @@ class BatchTraining(Training):
         self._session = None
 
     def train(self, esn, trainer, transient_data, learning_data, target):
-        r = self.sess(esn._reservoir)\
+        r = self.batch(esn._reservoir)\
                 .transient(transient_data)\
                 .memorize(learning_data)\
                 .train_readout(trainer, target)\
@@ -23,11 +22,11 @@ class BatchTraining(Training):
         esn.set_readout(r)
         return self
     
-    def sess(self, reservoir):
-        return _BatchSession(reservoir)
+    def batch(self, reservoir):
+        return _Batch(reservoir)
 
 
-class _BatchSession():
+class _Batch():
 
     def __init__(self, reservoir):
         self._reservoir = reservoir
@@ -74,7 +73,7 @@ class _BatchSession():
             part, size = self._get_mem_shrunk(i)
             mem[:, at:at+size] = part
             at += size
-        self._readouts.append(_ReadoutLayer(trainer.compute_output_w(mem, target), trainer.input_list))
+        self._readouts.append(trainer.compute_readout(mem, target))
         return self
 
     def get_readout(self):
