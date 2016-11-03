@@ -3,13 +3,21 @@ import numpy as np
 import scipy.sparse
 
 
+def _uniform(shape, bmin, bmax):
+    return np.random.rand(*shape).dot(bmax-bmin) + bmin
+
+
+def _normal(shape, mu, sigma):
+    return np.random.randn(*shape).dot(sigma) + mu
+
+
 class UniformDenseInit():
     def __init__(self, bmin, bmax):
         self._min = bmin
         self._max = bmax
 
     def init(self, srow, scol):
-        return np.random.rand(srow, scol).dot(self._max-self._min) + self._min
+        return _uniform((srow, scol), self._min, self._max)
 
 
 class NormalDenseInit():
@@ -18,16 +26,37 @@ class NormalDenseInit():
         self._mu = mu
 
     def init(self, srow, scol):
-        return np.random.randn(srow, scol).dot(self._sigma) + self._mu
+        return _normal((srow, scol), self._mu, self._sigma)
 
 
-class UniformSparseInit():
-    def __init__(self, bmin, bmax, density):
+class SparseInit():
+    def __init__(self, density):
         self._d = density
+
+    def init(self, srow, scol):
+        m = scipy.sparse.rand(srow, scol, density=self._d)
+        m.data = self._rand_data(len(m.data))
+        return m.tocsr()
+
+    def _rand_data(self, size):
+        raise NotImplementedError()
+
+
+class UniformSparseInit(SparseInit):
+    def __init__(self, bmin, bmax, density):
+        super(UniformSparseInit, self).__init__(density)
         self._min = bmin
         self._max = bmax
 
-    def init(self, srow, scol):
-        m = scipy.sparse.rand(srow, scol, density=self._d).dot(self._max-self._min)
-        m.data = np.random.rand(len(m.data),).dot(self._max-self._min) + self._min 
-        return m.tocsr()
+    def _rand_data(self, size):
+        return _uniform((size,), self._max, self._min)
+
+
+class NormalSparseInit(SparseInit):
+    def __init__(self, mu, sigma, density):
+        super(NormalSparseInit, self).__init__(density)
+        self._mu = mu
+        self._sigma = sigma
+
+    def _rand_data(self, size):
+        return _normal((size,), self._mu, self._sigma)
