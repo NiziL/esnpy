@@ -3,7 +3,6 @@
 import esnpy
 from esnpy import batch_trainer
 import numpy as np
-import pylab
 
 
 def main():
@@ -63,12 +62,13 @@ def main():
         u = prediction[i, :]
 
     mse = np.mean(np.square(test_target-prediction))
-    print('MSE: '+str(mse))
+    print('MSE: {}'.format(mse))
 
-    pylab.plot(test_target, label='target')
-    pylab.plot(prediction, label='prediction')
-    pylab.legend()
-    pylab.show()
+    #import pylab
+    #pylab.plot(test_target, label='target')
+    #pylab.plot(prediction, label='prediction')
+    #pylab.legend()
+    #pylab.show()
 
 
 if __name__ == '__main__':
