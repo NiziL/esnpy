@@ -20,9 +20,9 @@ Anyway, you can take a look at the `examples` folder for a quick start ;)
 ## Future work
 
 - Reservoir tuning with intrisic plasticity  
-..- Improving reservoirs using intrinsic plasticity, B. Schrauwen et al.  
-..- Online reservoir adaptation by intrinsic plasticity for backpropagation–decorrelation and echo state learning, J.J. Steil  
+..* *Improving reservoirs using intrinsic plasticity*, B. Schrauwen et al.  
+..* *Online reservoir adaptation by intrinsic plasticity* for backpropagation–decorrelation and echo state learning*, J.J. Steil  
 
 - Online training  
-..- Backpropagation-decorrelation: online recurrent learning with O(N) complexity, J.J. Steil
+..* *Backpropagation-decorrelation: online recurrent learning with O(N) complexity*, J.J. Steil
 
