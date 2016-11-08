@@ -1,6 +1,6 @@
 # esnpy
 
-An out-of-the-box librairy for Echo State Network experimentations.
+An out-of-the-box librairy for Echo State Network experimentations.  
 Based on *The "echo state" approach to analysing and training recurrent neural networks* by Herbert Jaeger and *A pratical guide to applying Echo State Networks* by Mantas Lukosevicius.
 
 ## Installation
@@ -19,10 +19,10 @@ Anyway, you can take a look at the `examples` folder for a quick start ;)
 
 ## Future work
 
-- Reservoir tuning with intrisic plasticity
-..- Improving reservoirs using intrinsic plasticity, B. Schrauwen et al.
-..- Online reservoir adaptation by intrinsic plasticity for backpropagation–decorrelation and echo state learning, J.J. Steil
+- Reservoir tuning with intrisic plasticity  
+..- Improving reservoirs using intrinsic plasticity, B. Schrauwen et al.  
+..- Online reservoir adaptation by intrinsic plasticity for backpropagation–decorrelation and echo state learning, J.J. Steil  
 
-- Online training
+- Online training  
 ..- Backpropagation-decorrelation: online recurrent learning with O(N) complexity, J.J. Steil
 
