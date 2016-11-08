@@ -15,7 +15,7 @@ git clone https://github.com/NiZiL/esnpy
 Sorry guys, I'm not into writing documentation...
 But please, feel free to open tickets and discuss about your trouble using `esnpy`, I'll enjoy to help you !
 
-Anyway, you can take a look at the `examples` folder for a quick start ;)
+Anyway, you can take a look at either the `examples` folder or the wiki for a quick start ;)
 
 ## Future work
 
