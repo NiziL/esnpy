@@ -11,6 +11,15 @@ def _normal(shape, mu, sigma):
     return np.random.randn(*shape).dot(sigma) + mu
 
 
+class CompositeInit():
+    def __init__(self, *args):
+        self.args = args
+
+    def init(self, srow, scol):
+        #assert srow == np.sum(arg[1] for arg in self.args)
+        return np.vstack(arg[0].init(arg[1], scol) for arg in self.args)
+
+
 class UniformDenseInit():
     def __init__(self, bmin, bmax):
         self._min = bmin
