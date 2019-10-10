@@ -1,6 +1,6 @@
 # esnpy
 
-An out-of-the-box librairy for Echo State Network experimentations.  
+An out-of-the-box library for Echo State Network experimentations.  
 Based on *The "echo state" approach to analysing and training recurrent neural networks* by Herbert Jaeger and *A pratical guide to applying Echo State Networks* by Mantas Lukosevicius.
 
 ## Installation
