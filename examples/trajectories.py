@@ -57,7 +57,7 @@ def main():
               linear_model.SGDClassifier(loss='hinge'),
               linear_model.SGDClassifier(loss='modified_huber'),
               linear_model.SGDClassifier(loss='perceptron')]
-    trainers = list(map(lambda x: batch_trainer.SklearnReg(x), models))
+    trainers = [batch_trainer.SklearnReg(m) for m in models]
     trainer_names = ["Logistic regression",
                      "SGD log",
                      "SGD hinge",
