@@ -22,7 +22,7 @@ class Readout():
         self._from = _from
 
     def _prepare_input(self, reservoir):
-        return np.hstack(map(reservoir.get, self._from))
+        return np.hstack(list(map(reservoir.get, self._from)))
 
     def compute(self, reservoir):
         u = self._prepare_input(reservoir)
