@@ -1,0 +1,33 @@
+[build-system]
+requires = [
+    "setuptools", "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "esnpy"
+version = "0.1.0"
+description = "Out-of-the-box framework for Echo State Networks experimentations."
+readme = "README.md"
+authors = [{name = "Théo BL", email = "biasutto.t@gmail.com"}]
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"    
+]
+keywords = ["machine learning", "neural networks", "echo state network"]
+dependencies = [
+    "numpy >= 1.23.0",
+    "scipy >= 1.9.3"
+]
+requires-python = ">= 3.9"
+
+[project.optional-dependencies]
+dev = ["black"]
+
+[project.urls]
+Homepage = "https://github.com/NiziL/esnpy"

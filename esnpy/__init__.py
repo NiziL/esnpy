@@ -1,2 +1,6 @@
-from .core import *
-from . import init, tuner, train
+# -*- coding: utf-8 -*-
+
+from .esn import ReservoirConfig, ESN, DeepESN
+from .train import *
+from . import init
+from . import tune
