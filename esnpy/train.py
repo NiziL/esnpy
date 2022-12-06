@@ -29,6 +29,7 @@ class RidgeTrainer(Trainer):
     def train(self, data: MatrixType, target: MatrixType) -> MatrixType:
         if self._bias:
             data = np.hstack((np.ones((data.shape[0], 1)), data))
-        return target.T.dot(data).dot(
-            linalg.inv(data.T.dot(data) + self._alpha * np.eye(data.shape[1]))
-        )
+        return linalg.solve(
+            np.dot(data.T, data) + self._alpha * np.eye(data.shape[1]),
+            np.dot(data.T, target),
+        ).T
