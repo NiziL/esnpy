@@ -10,13 +10,25 @@ class Trainer(ABC):
     def train(self, data: MatrixType, target: MatrixType) -> MatrixType:
         pass
 
+    @property
+    @abstractmethod
+    def has_bias(self):
+        pass
+
 
 class RidgeTrainer(Trainer):
-    def __init__(self, regul_coef):
+    def __init__(self, regul_coef: float, use_bias: bool = True):
         super().__init__()
-        self._b = regul_coef
+        self._alpha = regul_coef
+        self._bias = use_bias
+
+    @property
+    def has_bias(self):
+        return self._bias
 
     def train(self, data: MatrixType, target: MatrixType) -> MatrixType:
+        if self._bias:
+            data = np.hstack((np.ones((data.shape[0], 1)), data))
         return target.T.dot(data).dot(
-            linalg.inv(data.T.dot(data) + self._b * np.eye(data.shape[1]))
+            linalg.inv(data.T.dot(data) + self._alpha * np.eye(data.shape[1]))
         )

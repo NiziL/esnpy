@@ -28,7 +28,7 @@ def run(cfg: esnpy.ReservoirConfig):
 
     warmup_data, input_data, target_data, test_data = load_data()
 
-    esn = esnpy.ESN(cfg, trainer=esnpy.RidgeTrainer(1e-8))
+    esn = esnpy.ESN(cfg, trainer=esnpy.RidgeTrainer(1e-8, use_bias=False))
     esn.fit(warmup_data, input_data, target_data)
 
     predictions = np.zeros((TEST_LEN, 1))
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         esnpy.ReservoirConfig(
             input_size=1,
             size=1000,
-            leaky=0.1,
+            leaky=0.3,
             fn=np.tanh,
             input_bias=True,
             input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
@@ -61,7 +61,7 @@ if __name__ == "__main__":
         esnpy.ReservoirConfig(
             input_size=1,
             size=1000,
-            leaky=0.1,
+            leaky=0.3,
             fn=np.tanh,
             input_bias=True,
             input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),

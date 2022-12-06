@@ -24,7 +24,7 @@ class ReservoirConfig:
 
 
 class _Reservoir:
-    """ """
+    """Built from a ReservoirConfig"""
 
     def __init__(self, config: ReservoirConfig):
         super().__init__()
@@ -59,6 +59,13 @@ class _Reservoir:
         return outputs
 
 
+class _Identity:
+    """Built from a ReservoirConfig equals to None"""
+
+    def __call__(self, data: MatrixType) -> MatrixType():
+        return data
+
+
 class ESN:
     """ """
 
@@ -68,12 +75,7 @@ class ESN:
         self._trainer = trainer
         self._readout = None
 
-    def fit(
-        self,
-        warmup: MatrixType,
-        data: MatrixType,
-        target: MatrixType,
-    ):
+    def fit(self, warmup: MatrixType, data: MatrixType, target: MatrixType):
         self._reservoir(warmup)
         states = self._reservoir(data)
         self._readout = self._trainer.train(states, target)
@@ -81,7 +83,11 @@ class ESN:
     def transform(self, data: MatrixType) -> MatrixType:
         if self._readout is None:
             raise RuntimeError("Don't call transform before fit !")
-        return self._readout.dot(self._reservoir(data).T)
+        reservoir_output = self._reservoir(data).T
+        if self._trainer.has_bias:
+            ones = np.ones((reservoir_output.shape[1], 1))
+            reservoir_output = np.vstack((ones, reservoir_output))
+        return self._readout.dot(reservoir_output)
 
 
 class DeepESN:
