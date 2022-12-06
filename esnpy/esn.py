@@ -83,11 +83,11 @@ class ESN:
     def transform(self, data: MatrixType) -> MatrixType:
         if self._readout is None:
             raise RuntimeError("Don't call transform before fit !")
-        reservoir_output = self._reservoir(data).T
+        states = self._reservoir(data)
         if self._trainer.has_bias:
-            ones = np.ones((reservoir_output.shape[1], 1))
-            reservoir_output = np.vstack((ones, reservoir_output))
-        return self._readout.dot(reservoir_output)
+            ones = np.ones((states.shape[0], 1))
+            states = np.hstack((ones, states))
+        return states.dot(self._readout)
 
 
 class DeepESN:

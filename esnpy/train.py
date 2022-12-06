@@ -32,4 +32,4 @@ class RidgeTrainer(Trainer):
         return linalg.solve(
             np.dot(data.T, data) + self._alpha * np.eye(data.shape[1]),
             np.dot(data.T, target),
-        ).T
+        )
