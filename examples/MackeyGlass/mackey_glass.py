@@ -6,38 +6,36 @@ import numpy as np
 
 WARMUP_LEN = 100
 LEARN_LEN = 2000
-TEST_LEN = 500
+TEST_LEN = 2000
+ERROR_LEN = 500
 
 
 def load_data():
     data = np.loadtxt("MackeyGlass_t17.txt")[:, None]
     warmup = data[:WARMUP_LEN]
-    start = WARMUP_LEN
-    stop = WARMUP_LEN + LEARN_LEN
-    train = data[start:stop]
-    start = WARMUP_LEN + 1
-    stop = WARMUP_LEN + LEARN_LEN + 1
-    target = data[start:stop]
-    start = WARMUP_LEN + LEARN_LEN + 1
-    stop = WARMUP_LEN + LEARN_LEN + 1 + TEST_LEN
-    test = data[start:stop]
+    train = data[WARMUP_LEN:LEARN_LEN]
+    target = data[WARMUP_LEN + 1 : LEARN_LEN + 1]
+    test = data[LEARN_LEN : LEARN_LEN + TEST_LEN]
     return warmup, train, target, test
 
 
-def run(cfg: esnpy.ReservoirConfig):
+def run(cfg: esnpy.ReservoirConfig, trainer: esnpy.train.Trainer):
 
     warmup_data, input_data, target_data, test_data = load_data()
 
-    esn = esnpy.ESN(cfg, trainer=esnpy.RidgeTrainer(1e-8, use_bias=False))
+    esn = esnpy.ESN(cfg, trainer=trainer)
     esn.fit(warmup_data, input_data, target_data)
 
     predictions = np.zeros((TEST_LEN, 1))
     input_data = test_data[0, :]
     for i in range(TEST_LEN):
-        predictions[i, :] = esn.transform(input_data)
-        input_data = predictions[i, :]
+        pred = esn.transform(input_data)
+        predictions[i, :] = pred
+        input_data = pred
 
-    print(f"MSE: {np.mean(np.square(test_data[1:, :] - predictions[:-1, :]))}")
+    print(
+        f"MSE: {np.mean(np.square(test_data[1:ERROR_LEN+1] - predictions[:ERROR_LEN]))}"
+    )
 
 
 if __name__ == "__main__":
@@ -53,7 +51,8 @@ if __name__ == "__main__":
             input_tuners=[],
             intern_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
             intern_tuners=[esnpy.tune.SpectralRadiusSetter(1.25)],
-        )
+        ),
+        esnpy.train.RidgeTrainer(1e-8),
     )
 
     print("Learn with a sparse internal matrix")
@@ -68,5 +67,6 @@ if __name__ == "__main__":
             input_tuners=[],
             intern_init=esnpy.init.UniformSparseInit(-0.5, 0.5, density=0.01),
             intern_tuners=[esnpy.tune.SpectralRadiusSetter(1.25)],
-        )
+        ),
+        esnpy.train.RidgeTrainer(1e-8),
     )
