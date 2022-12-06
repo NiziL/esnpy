@@ -16,7 +16,7 @@ def load_data():
     warmup = data[:WARMUP_LEN]
     train = data[WARMUP_LEN:LEARN_LEN]
     target = data[WARMUP_LEN + 1 : LEARN_LEN + 1]
-    test = data[LEARN_LEN : LEARN_LEN + TEST_LEN]
+    test = data[LEARN_LEN : LEARN_LEN + TEST_LEN + 1]
     return warmup, train, target, test
 
 
@@ -28,15 +28,17 @@ def run(cfg: esnpy.ReservoirConfig, trainer: esnpy.train.Trainer):
     esn.fit(warmup_data, input_data, target_data)
 
     predictions = np.zeros((TEST_LEN, 1))
-    input_data = test_data[0, :]
+    input_data = test_data[0]
     for i in range(TEST_LEN):
         pred = esn.transform(input_data)
         predictions[i, :] = pred
+        # generative mode
         input_data = pred
+        # predictive mode
+        # input_data = test_data[i + 1]
 
-    print(
-        f"MSE: {np.mean(np.square(test_data[1:ERROR_LEN+1] - predictions[:ERROR_LEN]))}"
-    )
+    err = test_data[1 : ERROR_LEN + 1] - predictions[:ERROR_LEN]
+    print(f"MSE: {np.mean(np.square(err))}")
 
 
 if __name__ == "__main__":
