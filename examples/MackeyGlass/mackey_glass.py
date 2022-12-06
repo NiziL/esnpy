@@ -3,6 +3,7 @@
 
 import esnpy
 import numpy as np
+import time
 
 WARMUP_LEN = 100
 LEARN_LEN = 2000
@@ -40,6 +41,7 @@ def run(cfg: esnpy.ReservoirConfig, trainer: esnpy.train.Trainer):
 
 if __name__ == "__main__":
     print("Learn with a dense internal matrix")
+    start_time = time.perf_counter_ns()
     run(
         esnpy.ReservoirConfig(
             input_size=1,
@@ -54,8 +56,11 @@ if __name__ == "__main__":
         ),
         esnpy.train.RidgeTrainer(1e-8),
     )
+    stop_time = time.perf_counter_ns()
+    print(f"Computed in {(stop_time-start_time)/1e6:.3f}ms")
 
     print("Learn with a sparse internal matrix")
+    start_time = time.perf_counter_ns()
     run(
         esnpy.ReservoirConfig(
             input_size=1,
@@ -70,3 +75,5 @@ if __name__ == "__main__":
         ),
         esnpy.train.RidgeTrainer(1e-8),
     )
+    stop_time = time.perf_counter_ns()
+    print(f"Computed in {(stop_time-start_time)/1e6:.3f}ms")
