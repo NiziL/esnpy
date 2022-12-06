@@ -62,7 +62,7 @@ class _Reservoir:
 class _Identity:
     """Built from a ReservoirConfig equals to None"""
 
-    def __call__(self, data: MatrixType) -> MatrixType():
+    def __call__(self, data: MatrixType) -> MatrixType:
         return data
 
 
