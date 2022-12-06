@@ -95,9 +95,36 @@ class DeepESN:
 
     def __init__(self, configs: list[ReservoirConfig], trainer: Trainer):
         super().__init__()
+        self._reservoirs = [
+            _Reservoir(cfg) if cfg is not None else _Identity()
+            for cfg in configs
+        ]
+        self._readout = None
+        self._trainer = trainer
+
+    def __forward(self, data: MatrixType) -> MatrixType:
+        # TODO perf improvement
+        # collect size during previous loop
+        # create states matrix instead of list
+        # remove final vstack
+        states = []
+        in_data = data
+        for reservoir in self._reservoirs:
+            in_data = reservoir(in_data)
+            states.append(in_data)
+        states = np.hstack(states)
+        return states
 
     def fit(self, warmup: MatrixType, data: MatrixType, target: MatrixType):
-        ...
+        self.__forward(warmup)
+        states = self.__forward(data)
+        self._readout = self._trainer.train(states, target)
 
     def transform(self, data: MatrixType) -> MatrixType:
-        ...
+        if self._readout is None:
+            raise RuntimeError("Don't call transform before fit !")
+        states = self.__forward(data)
+        if self._trainer.has_bias:
+            ones = np.ones((states.shape[0], 1))
+            states = np.hstack((ones, states))
+        return states.dot(self._readout)

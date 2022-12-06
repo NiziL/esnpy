@@ -26,8 +26,8 @@ Use `github.com/NiziL/esnpy@<tag or branch>#egg=esnpy` to install from a specifi
 ### Code Examples 
 
 Don't want to read anything except code ? Take a look at the `examples/` folder for a quickstart !  
-- `MackeyGlass/` demonstrate how to learn to generate a chaotic time series (Mackey-Glass equations with $\tau = 17$),
-- `TrajectoryClassification/` demonstrate how to learn to classify 2D trajectories.
+- `MackeyGlass/` demonstrates how to learn to predict a chaotic time series
+- `TrajectoryClassification/` demonstrates how to learn to classify 2D trajectories
 
 ### Quickstart
 
@@ -90,11 +90,11 @@ Beware, the `data` parameter here is not the input data but the reservoir states
 ## Features & Roadmap
 
 - "core" features
-  - [x] ESN
+  - [x] ESN (one reservoir)
+  - [x] DeepESN (stacked reservoir)
   - [x] Initializer: random or normal distribution, dense or sparse matrix
   - [x] Tuner: spectral radius setter
   - [x] Trainer: basic ridge regression
-  - [ ] DeepESN
 - "nice to have" features
   - [ ] Trainer adapter for sklearn model
   - [ ] [Intrinsic plasticity](https://www.sciencedirect.com/science/article/pii/S0925231208000519) as a tuner
