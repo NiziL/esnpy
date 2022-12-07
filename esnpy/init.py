@@ -1,71 +1,73 @@
 # -*- coding: utf-8 -*-
+from abc import ABC, abstractmethod
+from .type import MatrixType, VectorType
 import numpy as np
-import scipy.sparse
+import scipy
 
 
 def _uniform(shape, bmin, bmax):
-    return np.random.rand(*shape).dot(bmax-bmin) + bmin
+    return np.random.rand(*shape).dot(bmax - bmin) + bmin
 
 
 def _normal(shape, mu, sigma):
     return np.random.randn(*shape).dot(sigma) + mu
 
 
-class CompositeInit():
-    def __init__(self, *args):
-        self.args = args
-
-    def init(self, srow, scol):
-        #assert srow == np.sum(arg[1] for arg in self.args)
-        return np.vstack(arg[0].init(arg[1], scol) for arg in self.args)
+class Initializer(ABC):
+    @abstractmethod
+    def init(self, shape: tuple[int, int]) -> MatrixType:
+        pass
 
 
-class UniformDenseInit():
-    def __init__(self, bmin, bmax):
-        self._min = bmin
-        self._max = bmax
+class UniformDenseInit(Initializer):
+    def __init__(self, min_value: float, max_value: float):
+        super().__init__()
+        self._min = min_value
+        self._max = max_value
 
-    def init(self, srow, scol):
-        return _uniform((srow, scol), self._min, self._max)
-
-
-class NormalDenseInit():
-    def __init__(self, mu, sigma):
-        self._sigma = sigma
-        self._mu = mu
-
-    def init(self, srow, scol):
-        return _normal((srow, scol), self._mu, self._sigma)
+    def init(self, shape: tuple[int, int]) -> MatrixType:
+        return _uniform(shape, self._min, self._max)
 
 
-class SparseInit():
-    def __init__(self, density):
+class NormalDenseInit(Initializer):
+    def __init__(self, mean: float, std: float):
+        super().__init__()
+        self._mu = mean
+        self._sigma = std
+
+    def init(self, shape: tuple[int, int]) -> MatrixType:
+        return _normal(shape, self._mu, self._sigma)
+
+
+class SparseInitializer(Initializer):
+    def __init__(self, density: float):
         self._d = density
 
-    def init(self, srow, scol):
-        m = scipy.sparse.rand(srow, scol, density=self._d)
-        m.data = self._rand_data(len(m.data))
-        return m.tocsr()
+    def init(self, shape: tuple[int, int]) -> MatrixType:
+        m = scipy.sparse.rand(*shape, density=self._d)
+        m.data = self._sparse_init(m.data.shape[0])
+        return m
 
-    def _rand_data(self, size):
-        raise NotImplementedError()
-
-
-class UniformSparseInit(SparseInit):
-    def __init__(self, bmin, bmax, density):
-        super(UniformSparseInit, self).__init__(density)
-        self._min = bmin
-        self._max = bmax
-
-    def _rand_data(self, size):
-        return _uniform((size,), self._max, self._min)
+    @abstractmethod
+    def _sparse_init(self, size: int) -> VectorType:
+        pass
 
 
-class NormalSparseInit(SparseInit):
-    def __init__(self, mu, sigma, density):
-        super(NormalSparseInit, self).__init__(density)
-        self._mu = mu
-        self._sigma = sigma
+class UniformSparseInit(SparseInitializer):
+    def __init__(self, min_value, max_value, density):
+        super().__init__(density)
+        self._min = min_value
+        self._max = max_value
 
-    def _rand_data(self, size):
+    def _sparse_init(self, size: int) -> VectorType:
+        return _uniform((size,), self._min, self._max)
+
+
+class NormalSparseInit(SparseInitializer):
+    def __init__(self, mean, std, density):
+        super().__init__(density)
+        self._mu = mean
+        self._sigma = std
+
+    def _sparse_init(self, size: int) -> VectorType:
         return _normal((size,), self._mu, self._sigma)
