@@ -70,4 +70,4 @@ class NormalSparseInit(SparseInitializer):
         self._sigma = std
 
     def _sparse_init(self, size: int) -> VectorType:
-        return _normal((size,), self._my, self._sigma)
+        return _normal((size,), self._mu, self._sigma)
