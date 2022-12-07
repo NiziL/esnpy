@@ -14,7 +14,9 @@ The documentation is coming soon.
 
 #### From Pypi
 
-Coming soon.
+```bash
+pip install esnpy
+```
 
 #### From source
 
