@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-import numpy.typing as npt
+import numpy as np
+from typing import Any
 
-# from typing import TypeVar, Literal
-
-# TODO improve this with fixed tensor rank
-
-MatrixType = npt.NDArray
-VectorType = npt.NDArray
+MatrixType = np.ndarray[tuple[Any, Any], np.dtype]
+VectorType = np.ndarray[tuple[Any], np.dtype]
