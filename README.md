@@ -1,9 +1,9 @@
 # esnpy
 
 `esnpy` is an out-of-the-box framework to experiment around ESN and DeepESN.  
-Models has been implemented in pure NumPy/SciPy, so there's no need for a powerful GPU, or some esoteric requirements. 
+Models have been implemented in pure NumPy/SciPy, so there is no need for a powerful GPU, or any esoteric requirements. 
 
-Right now, the focus is on batch training, and I haven't take into account the feedback loop.  
+Right now, the focus is on batch training, and feedback loops have not been taken into account.  
 But feel free to open a ticket a discuss about anything you need, or features you want !
 
 The documentation is coming soon.  
@@ -12,7 +12,7 @@ The documentation is coming soon.
 
 ### Installation
 
-#### From Pypi
+#### From PyPI
 
 ```bash
 pip install esnpy
@@ -33,9 +33,9 @@ Don't want to read anything except code ? Take a look at the `examples/` folder 
 
 ### Quickstart
 
-You can create your ESN with `esnpy.ESN`. The constructor need a `esnpy.ReservoirConfig` and an implementation of `esnpy.train.Trainer`.  
-Then, simply call `fit` function passing some warm up and training data with the related targets.  
-Once trained, do predictions using `transform`.
+You can create your ESN with `esnpy.ESN`. The constructor needs a `esnpy.ReservoirConfig` and an implementation of `esnpy.train.Trainer`.  
+Then, simply call `fit` function by passing some warm up and training data with the related targets.  
+Once trained, run predictions using `transform`.
 
 ```python
 import esnpy
@@ -86,9 +86,9 @@ Beware, the `data` parameter here is not the input data but the reservoir states
 
 ## Tips & Tricks
 
-- Sparse matrix are usually way faster than dense matrix
-- If you want to also use the input vector to compute the output (as in original paper), you'll have to use a `esnpy.DeepESN` with a `None` as the first element of the reservoir config list. It will create a simple identity function as the first layer, and so allow a `Trainer` to get access to these data.
-- Use `numpy.random.seed(seed)` before creating a each ESN if you want to compare two indentical reservoir.
+- Sparse matrices are usually way faster than dense matrix
+- If you want to also use the input vector to compute the output (as in the original paper), you'll have to use a `esnpy.DeepESN` with a `None` as the first element of the reservoir config list. It will create a simple identity function as the first layer, which will allow a `Trainer` to get access to these data.
+- Use `numpy.random.seed(seed)` before creating an ESN if you want to compare two indentical reservoir.
 
 ## Features & Roadmap
 
