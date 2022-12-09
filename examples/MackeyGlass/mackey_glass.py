@@ -20,8 +20,11 @@ def load_data():
     return warmup, train, target, test
 
 
-def run(cfg: list[esnpy.ReservoirConfig], trainer: esnpy.train.Trainer):
-
+def run(
+    cfg: list[esnpy.ReservoirConfig],
+    trainer: esnpy.train.Trainer,
+    mask: list[bool] = None,
+):
     warmup_data, input_data, target_data, test_data = load_data()
 
     if len(cfg) == 1:
@@ -106,4 +109,39 @@ if __name__ == "__main__":
             ),
         ],
         esnpy.train.RidgeTrainer(1e-8),
+    )
+
+    print("DeepESN with masking")
+    run(
+        [
+            None,
+            esnpy.ReservoirConfig(
+                input_size=1,
+                size=1000,
+                leaky=0.3,
+                fn=np.tanh,
+                input_bias=True,
+                input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
+                input_tuners=[],
+                intern_init=esnpy.init.UniformSparseInit(
+                    -0.5, 0.5, density=0.01
+                ),
+                intern_tuners=[esnpy.tune.SpectralRadiusSetter(1.25)],
+            ),
+            esnpy.ReservoirConfig(
+                input_size=1000,
+                size=100,
+                leaky=0.3,
+                fn=np.tanh,
+                input_bias=True,
+                input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
+                input_tuners=[],
+                intern_init=esnpy.init.UniformSparseInit(
+                    -0.5, 0.5, density=0.01
+                ),
+                intern_tuners=[esnpy.tune.SpectralRadiusSetter(1.25)],
+            ),
+        ],
+        esnpy.train.RidgeTrainer(1e-8),
+        mask=[True, False, True],
     )

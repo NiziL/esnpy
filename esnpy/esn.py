@@ -52,25 +52,38 @@ class ESN(_BaseESN):
 class DeepESN(_BaseESN):
     """ """
 
-    def __init__(self, configs: list[ReservoirConfig], trainer: Trainer):
+    def __init__(
+        self,
+        configs: list[ReservoirConfig],
+        trainer: Trainer,
+        mask: list[bool] = None,
+    ):
         super().__init__(trainer)
         self._reservoirs = [
             _Reservoir(cfg) if cfg is not None else _Identity()
             for cfg in configs
         ]
+        if mask is None:
+            self._mask = [True] * len(self._reservoirs)
+        else:
+            self._mask = mask
 
     def _warmup(self, data: MatrixType):
         sizes = []
-        for reservoir in self._reservoirs:
+        for reservoir, masked in zip(self._reservoirs, self._mask):
             data = reservoir(data)
-            sizes.append(data.shape[1])
+            if masked:
+                sizes.append(data.shape[1])
         self._sizes = sizes
 
     def _forward(self, data: MatrixType) -> MatrixType:
         states = np.zeros((data.shape[0], sum(self._sizes)))
-        for i, reservoir in enumerate(self._reservoirs):
+        for i, (reservoir, masked) in enumerate(
+            zip(self._reservoirs, self._mask)
+        ):
             data = reservoir(data)
-            store_from = sum(self._sizes[:i])
-            store_to = sum(self._sizes[: i + 1])
-            states[:, store_from:store_to] = data
+            if masked:
+                store_from = sum(self._sizes[:i])
+                store_to = sum(self._sizes[: i + 1])
+                states[:, store_from:store_to] = data
         return states
