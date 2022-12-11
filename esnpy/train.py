@@ -24,11 +24,9 @@ class Trainer(ABC):
 
 
 class RidgeTrainer(Trainer):
-    def __init__(
-        self, regul_coef: float, use_bias: bool = True, use_input=True
-    ):
+    def __init__(self, alpha: float, use_bias: bool = True, use_input=True):
         super().__init__()
-        self._alpha = regul_coef
+        self._alpha = alpha
         self._bias = use_bias
         self._input = use_input
 
