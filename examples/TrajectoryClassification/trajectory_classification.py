@@ -58,7 +58,7 @@ def main():
     print("Creating the ESN...", end=" ")
     esn = esnpy.ESN(
         esnpy.ReservoirConfig(
-            size=1000,
+            size=512,
             leaky=0.8,
             fn=np.tanh,
             input_size=2,
