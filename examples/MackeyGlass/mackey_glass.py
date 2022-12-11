@@ -4,6 +4,7 @@
 import esnpy
 import numpy as np
 import time
+from typing import Union
 
 WARMUP_LEN = 100
 LEARN_LEN = 2000
@@ -20,14 +21,8 @@ def load_data():
     return warmup, train, target, test
 
 
-def run(cfg: list[esnpy.ReservoirConfig], trainer: esnpy.train.Trainer):
-
+def run(esn: Union[esnpy.ESN, esnpy.DeepESN]):
     warmup_data, input_data, target_data, test_data = load_data()
-
-    if len(cfg) == 1:
-        esn = esnpy.ESN(cfg[0], trainer)
-    else:
-        esn = esnpy.DeepESN(cfg, trainer)
 
     start_time = time.perf_counter_ns()
     esn.fit(warmup_data, input_data, target_data)
@@ -49,9 +44,9 @@ def run(cfg: list[esnpy.ReservoirConfig], trainer: esnpy.train.Trainer):
 
 
 if __name__ == "__main__":
-    print("Learn with a dense internal matrix")
+    print("ESN with a dense internal matrix")
     run(
-        [
+        esnpy.ESN(
             esnpy.ReservoirConfig(
                 input_size=1,
                 size=1000,
@@ -61,49 +56,76 @@ if __name__ == "__main__":
                 input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
                 input_tuners=[],
                 intern_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
-                intern_tuners=[esnpy.tune.SpectralRadiusSetter(1.25)],
-            )
-        ],
-        esnpy.train.RidgeTrainer(1e-8),
-    )
-
-    print("Learn with a sparse internal matrix")
-    run(
-        [
-            esnpy.ReservoirConfig(
-                input_size=1,
-                size=1000,
-                leaky=0.3,
-                fn=np.tanh,
-                input_bias=True,
-                input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
-                input_tuners=[],
-                intern_init=esnpy.init.UniformSparseInit(
-                    -0.5, 0.5, density=0.01
-                ),
-                intern_tuners=[esnpy.tune.SpectralRadiusSetter(1.25)],
-            )
-        ],
-        esnpy.train.RidgeTrainer(1e-8),
-    )
-
-    print("Use the input in the ridge regression")
-    run(
-        [
-            None,
-            esnpy.ReservoirConfig(
-                input_size=1,
-                size=1000,
-                leaky=0.3,
-                fn=np.tanh,
-                input_bias=True,
-                input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
-                input_tuners=[],
-                intern_init=esnpy.init.UniformSparseInit(
-                    -0.5, 0.5, density=0.01
-                ),
-                intern_tuners=[esnpy.tune.SpectralRadiusSetter(1.25)],
+                intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
             ),
-        ],
-        esnpy.train.RidgeTrainer(1e-8),
+            esnpy.train.RidgeTrainer(1e-8),
+        )
+    )
+
+    print("ESN with a sparse internal matrix")
+    run(
+        esnpy.ESN(
+            esnpy.ReservoirConfig(
+                input_size=1,
+                size=1000,
+                leaky=0.3,
+                fn=np.tanh,
+                input_bias=True,
+                input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
+                input_tuners=[],
+                intern_init=esnpy.init.UniformSparseInit(-0.5, 0.5, 0.01),
+                intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
+            ),
+            esnpy.train.RidgeTrainer(1e-8),
+        )
+    )
+
+    print("DeepESN with masking")
+    run(
+        esnpy.DeepESN(
+            [
+                esnpy.ReservoirConfig(
+                    input_size=1,
+                    size=1024,
+                    leaky=0.3,
+                    fn=np.tanh,
+                    input_bias=True,
+                    input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
+                    input_tuners=[],
+                    intern_init=esnpy.init.UniformSparseInit(
+                        -0.5, 0.5, density=0.01
+                    ),
+                    intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
+                ),
+                esnpy.ReservoirConfig(
+                    input_size=1024,
+                    size=512,
+                    leaky=0.3,
+                    fn=np.tanh,
+                    input_bias=True,
+                    input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
+                    input_tuners=[],
+                    intern_init=esnpy.init.UniformSparseInit(
+                        -0.5, 0.5, density=0.01
+                    ),
+                    intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
+                ),
+                esnpy.ReservoirConfig(
+                    input_size=512,
+                    size=128,
+                    leaky=0.3,
+                    fn=np.tanh,
+                    input_bias=True,
+                    input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
+                    input_tuners=[],
+                    intern_init=esnpy.init.UniformSparseInit(
+                        -0.5, 0.5, density=0.01
+                    ),
+                    intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
+                ),
+            ],
+            trainer=esnpy.train.RidgeTrainer(1e-8),
+            # only use the two last reservoirs for training
+            mask=[False, True, True],
+        )
     )

@@ -56,10 +56,3 @@ class _Reservoir:
                 vec = np.hstack((1, vec))
             outputs[i] = self.__update(vec)
         return outputs
-
-
-class _Identity:
-    """Built from a ReservoirConfig equals to None"""
-
-    def __call__(self, data: MatrixType) -> MatrixType:
-        return data

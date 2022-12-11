@@ -1,41 +1,29 @@
 # esnpy
 
 `esnpy` is an out-of-the-box framework to experiment around ESN and DeepESN.  
-Models has been implemented in pure NumPy/SciPy, so there's no need for a powerful GPU, or some esoteric requirements. 
+Models have been implemented in pure NumPy/SciPy, so there is no need for a powerful GPU, or any esoteric requirements. 
 
-Right now, the focus is on batch training, and I haven't take into account the feedback loop.  
-But feel free to open a ticket a discuss about anything you need, or features you want !
+Right now, the focus is on batch training, and feedback loops have not been taken into account.  
+But feel free to open a ticket a discuss about anything you need, features you want, or even help !
 
-The documentation is coming soon.  
+Note from the author: *`esnpy` is a small projet I initiated during my master intership, and have recently cleaned up. I might keep working on it for fun, but If you want/need a more robust framework, [ReservoirPy](https://github.com/reservoirpy/reservoirpy) might be the own you need ;)*
 
 ## Getting Started
 
 ### Installation
 
-#### From Pypi
-
+**From PyPI**
 ```bash
 pip install esnpy
 ```
 
-#### From source
-
+**From source**
 ```bash
 pip install git+https://github.com/NiziL/esnpy#egg=esnpy
 ```
 Use `github.com/NiziL/esnpy@<tag or branch>#egg=esnpy` to install from a specific branch or tag instead of main.
 
-### Code Examples 
-
-Don't want to read anything except code ? Take a look at the `examples/` folder for a quickstart !  
-- `MackeyGlass/` demonstrates how to learn to predict a chaotic time series
-- `TrajectoryClassification/` demonstrates how to learn to classify 2D trajectories
-
 ### Quickstart
-
-You can create your ESN with `esnpy.ESN`. The constructor need a `esnpy.ReservoirConfig` and an implementation of `esnpy.train.Trainer`.  
-Then, simply call `fit` function passing some warm up and training data with the related targets.  
-Once trained, do predictions using `transform`.
 
 ```python
 import esnpy
@@ -44,14 +32,26 @@ config = createConfig()
 trainer = createTrainer()
 warmup, data, target = loadData()
 
-esnpy.ESN(config, trainer)
-esnpy.fit(warmup, data, target)
+# create the echo state network
+esn = esnpy.ESN(config, trainer)
+# train it
+esn.fit(warmup, data, target)
+# test it
 predictions = esnpy.transform(data)
-
 print(f"error: {compute_err(target, predictions)}")
 ```
 
-#### `ReservoirConfig` parameters
+#### `ESN` and `DeepESN`
+
+You can create your ESN with `esnpy.ESN`. 
+The constructor needs a `esnpy.ReservoirConfig` and an implementation of `esnpy.train.Trainer`. 
+
+`esnpy.DeepESN` doesn't differ a lot, it just expect a list of `ReservoirConfig` and have an optional parameters `mask` to specify from which reservoirs the `Trainer` should learn. The size of `mask` and `configs` must be the same. 
+
+Then, simply call `fit` function by passing some warm up and training data with the related targets.  
+Once trained, run predictions using `transform`.
+
+#### `ReservoirConfig`
 
 | Parameters    | Type                     | Info                                         |
 |---------------|--------------------------|----------------------------------------------|
@@ -65,7 +65,7 @@ print(f"error: {compute_err(target, predictions)}")
 | intern_init   | `esnpy.init.Initializer` | Define how to intialize the internal weights |
 | intern_tuners | `list[esnpy.init.Tuner]` | Define how to tune the internal weights      |
 
-#### `esnpy.init.Initializer` and `esnpy.tune.Tuner` 
+#### `Initializer` and `Tuner` 
 
 `esnpy.init.Initializer` and `esnpy.tune.Tuner` are the abstract base classes used to setup the input and internal weights of a reservoir.
 
@@ -77,33 +77,22 @@ For example, `esnpy` provides a `SpectralRadiusTuner` to change the spectral rad
 
 #### `Trainer`
 
-`esnpy.train.Trainer` is responsible to create the output weights matrix from the training data and targets.
+`esnpy.train.Trainer` is responsible to create the output weights matrix from the training data and targets.  
+It is defined by a `train(inputs: Matrix, data: Matrix, target: Matrix) -> Matrix` function.
 
-It is defined by a `train(data: Matrix, target: Matrix) -> Matrix` function.
-Beware, the `data` parameter here is not the input data but the reservoir states recorded during the training.
+`esnpy` provides a `RidgeTrainer` to compute the output weights using a ridge regression. 
+This trainer has three parameters : one float, the regularization parameter's weight `alpha`, and two optionals boolean (default to true) `use_bias` and `use_input` to control if we should use a bias and the input to compute the readout weights.
 
-`esnpy` provides a `RidgeTrainer` to compute the output weights using a ridge regression.
+## Code Examples 
+
+Want to see some code in action ? Take a look at the `examples/` directory:
+- `MackeyGlass/` demonstrates how to learn to predict a time series
+- `TrajectoryClassification/` demonstrates how to learn to classify 2D trajectories
 
 ## Tips & Tricks
 
-- Sparse matrix are usually way faster than dense matrix
-- If you want to also use the input vector to compute the output (as in original paper), you'll have to use a `esnpy.DeepESN` with a `None` as the first element of the reservoir config list. It will create a simple identity function as the first layer, and so allow a `Trainer` to get access to these data.
-- Use `numpy.random.seed(seed)` before creating a each ESN if you want to compare two indentical reservoir.
-
-## Features & Roadmap
-
-- "core" features
-  - [x] ESN (one reservoir)
-  - [x] DeepESN (stacked reservoir)
-  - [x] Initializer: random or normal distribution, dense or sparse matrix
-  - [x] Tuner: spectral radius setter
-  - [x] Trainer: basic ridge regression
-- "nice to have" features
-  - [ ] Trainer adapter for sklearn model
-  - [ ] [Intrinsic plasticity](https://www.sciencedirect.com/science/article/pii/S0925231208000519) as a tuner
-- "maybe later" features
-  - [ ] better handling of feeback loop
-  - [ ] online training (have to find papers about it)
+- Sparse matrices are usually way faster than dense matrix
+- Use `numpy.random.seed(seed)` before creating an ESN if you want to compare two indentical reservoir.
 
 ## Bibliography
 
