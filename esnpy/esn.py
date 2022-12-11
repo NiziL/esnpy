@@ -74,6 +74,8 @@ class DeepESN(_BaseESN):
             data = reservoir(data)
             if masked:
                 sizes.append(data.shape[1])
+            else:
+                sizes.append(0)
         self._sizes = sizes
 
     def _forward(self, data: MatrixType) -> MatrixType:
