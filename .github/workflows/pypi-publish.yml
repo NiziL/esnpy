@@ -1,7 +1,7 @@
 name: PyPI Publishing
 on: 
   release:
-    type: [published]
+    types: [published]
 
 jobs:
   build-n-publih:
