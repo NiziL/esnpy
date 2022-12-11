@@ -1,32 +1,35 @@
-name: Build esnpy wheel and publish it on PyPI
-on: push
+name: PyPI Publishing
+on: 
+  release:
+    type: [published]
 
 jobs:
   build-n-publih:
-    name: build and publish
+    name: Build and Publish
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@master
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
-    - name: Install pypa / build
+    - name: Checkout release tag  
+      uses: actions/checkout@v3
+        with:
+          ref: $GITHUB_REF
+    - name: Install build dependencies
       run: >-
         python -m
         pip install
         build
         --user
-    - name: Build a binary wheel and a source tarball
+    - name: Build
       run: >-
         python -m
         build
         --sdist
         --wheel
         --outdir dist/
-    - name: Publish to PyPI
-      if: startsWith(github.ref, 'refs/tags')
+    - name: Publish
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
