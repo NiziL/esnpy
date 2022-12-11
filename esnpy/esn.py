@@ -3,7 +3,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 from .train import Trainer
 from .type import MatrixType
-from .reservoir import ReservoirConfig, _Reservoir, _Identity
+from .reservoir import ReservoirConfig, _Reservoir
 
 
 class _BaseESN(ABC):
@@ -23,16 +23,19 @@ class _BaseESN(ABC):
     def fit(self, warmup: MatrixType, data: MatrixType, target: MatrixType):
         self._warmup(warmup)
         states = self._forward(data)
-        self._Wout = self._trainer.train(states, target)
+        self._Wout = self._trainer.train(data, states, target)
 
     def transform(self, data: MatrixType) -> MatrixType:
         if self._Wout is None:
             raise RuntimeError("Don't call transform before fit !")
         states = self._forward(data)
-        if self._trainer.has_bias:
-            ones = np.ones((states.shape[0], 1))
-            states = np.hstack((ones, states))
-        return states.dot(self._Wout)
+        inputs = []
+        if self._trainer.use_bias:
+            inputs.append(np.ones((states.shape[0], 1)))
+        if self._trainer.use_input:
+            inputs.append(data)
+        inputs.append(states)
+        return np.hstack(inputs).dot(self._Wout)
 
 
 class ESN(_BaseESN):
@@ -59,10 +62,7 @@ class DeepESN(_BaseESN):
         mask: list[bool] = None,
     ):
         super().__init__(trainer)
-        self._reservoirs = [
-            _Reservoir(cfg) if cfg is not None else _Identity()
-            for cfg in configs
-        ]
+        self._reservoirs = [_Reservoir(cfg) for cfg in configs]
         if mask is None:
             self._mask = [True] * len(self._reservoirs)
         else:

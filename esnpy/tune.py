@@ -13,7 +13,7 @@ class Tuner(ABC):
         pass
 
 
-class SpectralRadiusSetter(Tuner):
+class SpectralRadiusTuner(Tuner):
     def __init__(self, rho: float):
         super().__init__()
         self._rho = rho
