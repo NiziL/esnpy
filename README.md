@@ -6,7 +6,7 @@ Models have been implemented in pure NumPy/SciPy, so there is no need for a powe
 Right now, the focus is on batch training, and feedback loops have not been taken into account.  
 But feel free to open a ticket a discuss about anything you need, features you want, or even help !
 
-Note from the author: *`esnpy` is a small projet I initiated during my master intership, and have recently cleaned up. I might keep working on it for fun, but If you want/need a more robust framework, [ReservoirPy](https://github.com/reservoirpy/reservoirpy) might be the own you need ;)*
+Note from the author: *`esnpy` is a small projet I initiated during my master intership, and have recently cleaned up. I might keep working on it for fun, but If you want/need a more robust framework, [ReservoirPy](https://github.com/reservoirpy/reservoirpy) might be the one you're searching for ;)*
 
 ## Getting Started
 
@@ -44,26 +44,32 @@ print(f"error: {compute_err(target, predictions)}")
 #### `ESN` and `DeepESN`
 
 You can create your ESN with `esnpy.ESN`. 
-The constructor needs a `esnpy.ReservoirConfig` and an implementation of `esnpy.train.Trainer`. 
+The constructor needs a `esnpy.Reservoir` and an implementation of `esnpy.train.Trainer`. 
 
-`esnpy.DeepESN` doesn't differ a lot, it just expect a list of `ReservoirConfig` and have an optional parameters `mask` to specify from which reservoirs the `Trainer` should learn. The size of `mask` and `configs` must be the same. 
+`esnpy.DeepESN` doesn't differ a lot, it just expect a list of `Reservoir` and have an optional parameters `mask` to specify from which reservoirs the `Trainer` should learn. The size of `mask` and `reservoirs` must be the same. 
 
 Then, simply call `fit` function by passing some warm up and training data with the related targets.  
 Once trained, run predictions using `transform`.
 
-#### `ReservoirConfig`
+#### `Reservoir` and `ReservoirConfig`
 
-| Parameters    | Type                     | Info                                         |
-|---------------|--------------------------|----------------------------------------------|
-| input_size    | `int`                    | Size of input vectors                        |
-| size          | `int`                    | Number of units in the reservoir             |
-| leaky         | `float`                  | Leaky parameter of the reservoir             |
-| fn            | `Callable`               | Activation function of the reservoir         |
-| input_bias    | `bool`                   | Enable the usage of a bias in the input      |
-| input_init    | `esnpy.init.Initializer` | Define how to initialize the input weights   |
-| input_tuners  | `list[esnpy.tune.Tuner]` | Define how to tune the input weights         |
-| intern_init   | `esnpy.init.Initializer` | Define how to intialize the internal weights |
-| intern_tuners | `list[esnpy.init.Tuner]` | Define how to tune the internal weights      |
+A `Reservoir` can easily be initialized using the `ReservoirConfig` dataclass.  
+For convenience, the configuration class is also a builder, exposing a `build()` method.
+This method has an optional `seed` parameter used to make deterministic initialization, and so to ease the comparaison of two identical reservoirs.
+
+##### Configuration parameters
+
+| Parameters    | Type                     | Info                                         | Default   |
+|---------------|--------------------------|----------------------------------------------|-----------|
+| input_size    | `int`                    | Size of input vectors                        |           |
+| size          | `int`                    | Number of units in the reservoir             |           |
+| leaky         | `float`                  | Leaky parameter of the reservoir             |           |
+| fn            | `Callable`               | Activation function of the reservoir         | `np.tanh` |
+| input_bias    | `bool`                   | Enable the usage of a bias in the input      | `True`    |
+| input_init    | `esnpy.init.Initializer` | Define how to initialize the input weights   |           |
+| input_tuners  | `list[esnpy.tune.Tuner]` | Define how to tune the input weights         | `[]`      |
+| intern_init   | `esnpy.init.Initializer` | Define how to intialize the internal weights |           |
+| intern_tuners | `list[esnpy.init.Tuner]` | Define how to tune the internal weights      | `[]`      |
 
 #### `Initializer` and `Tuner` 
 
@@ -88,11 +94,6 @@ This trainer has three parameters : one float, the regularization parameter's we
 Want to see some code in action ? Take a look at the `examples/` directory:
 - `MackeyGlass/` demonstrates how to learn to predict a time series
 - `TrajectoryClassification/` demonstrates how to learn to classify 2D trajectories
-
-## Tips & Tricks
-
-- Sparse matrices are usually way faster than dense matrix
-- Use `numpy.random.seed(seed)` before creating an ESN if you want to compare two indentical reservoir.
 
 ## Bibliography
 

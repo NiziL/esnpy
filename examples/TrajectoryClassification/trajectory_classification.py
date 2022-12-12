@@ -67,7 +67,7 @@ def main():
             input_tuners=[],
             intern_init=esnpy.init.NormalSparseInit(0, 1, density=0.01),
             intern_tuners=[esnpy.tune.SpectralRadiusSetter(1.3)],
-        ),
+        ).build(),
         esnpy.train.RidgeTrainer(1e-8),
     )
     print("ok")
