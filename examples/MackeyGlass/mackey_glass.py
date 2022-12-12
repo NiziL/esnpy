@@ -5,6 +5,7 @@ import esnpy
 import numpy as np
 import time
 from typing import Union
+from pathlib import Path
 
 WARMUP_LEN = 100
 LEARN_LEN = 2000
@@ -13,7 +14,8 @@ ERROR_LEN = 500
 
 
 def load_data():
-    data = np.loadtxt("MackeyGlass_t17.txt")[:, None]
+    data_path = Path(__file__).parent.absolute()
+    data = np.loadtxt(data_path / "MackeyGlass_t17.txt")[:, None]
     warmup = data[:WARMUP_LEN]
     train = data[WARMUP_LEN:LEARN_LEN]
     target = data[WARMUP_LEN + 1 : LEARN_LEN + 1]
