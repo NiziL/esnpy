@@ -33,7 +33,7 @@ trainer = createTrainer()
 warmup, data, target = loadData()
 
 # create the echo state network
-esn = esnpy.ESN(config, trainer)
+esn = esnpy.ESN(config.build(), trainer)
 # train it
 esn.fit(warmup, data, target)
 # test it
@@ -57,9 +57,7 @@ A `Reservoir` can easily be initialized using the `ReservoirConfig` dataclass.
 For convenience, the configuration class is also a builder, exposing a `build()` method.
 This method has an optional `seed` parameter used to make deterministic initialization, and so to ease the comparaison of two identical reservoirs.
 
-##### Configuration parameters
-
-| Parameters    | Type                     | Info                                         | Default   |
+| Parameters    | Type                     | Description                                  | Default   |
 |---------------|--------------------------|----------------------------------------------|-----------|
 | input_size    | `int`                    | Size of input vectors                        |           |
 | size          | `int`                    | Number of units in the reservoir             |           |
