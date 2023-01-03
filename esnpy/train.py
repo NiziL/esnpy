@@ -4,6 +4,8 @@ from .type import MatrixType
 import numpy as np
 from scipy import linalg
 
+__all__ = ["Trainer", "RidgeTrainer"]
+
 
 class Trainer(ABC):
     @abstractmethod

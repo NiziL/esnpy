@@ -6,6 +6,8 @@ from typing import Callable
 from .init import Initializer
 from .tune import Tuner
 
+__all__ = ["ReservoirConfig", "Reservoir"]
+
 
 @dataclass
 class ReservoirConfig:

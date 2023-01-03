@@ -2,8 +2,10 @@
 import numpy as np
 from abc import ABC, abstractmethod
 from .train import Trainer
-from .type import MatrixType
+from ._type import MatrixType
 from .reservoir import ReservoirConfig, Reservoir
+
+__all__ = ["ESN", "DeepESN"]
 
 
 class _BaseESN(ABC):
