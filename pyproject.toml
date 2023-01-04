@@ -31,3 +31,6 @@ dev = ["black", "sphinx-pyproject"]
 
 [project.urls]
 GitHub = "https://github.com/NiziL/esnpy"
+
+[tool.sphinx-pyproject]
+extensions = ["sphinx.ext.autodoc"]
