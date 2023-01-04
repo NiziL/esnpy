@@ -1,0 +1,22 @@
+name: test-sphinx-ci
+on:
+  push:
+    branch: sphinx
+    
+jobs:
+  doc-publishing:
+    name: Build documentation and publish on gh-page
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+    - name: Checkout release tag  
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref }}
+    - name: Deploy sphinx documentation
+      uses: sphinx-notes/pages@v3

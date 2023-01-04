@@ -5,7 +5,7 @@ on:
 
 jobs:
   doc-publishing:
-    name: Build sphinx documentation and publish on gh-page
+    name: Build documentation and publish on gh-page
     runs-on: ubuntu-latest
     environment:
       name: github-pages
