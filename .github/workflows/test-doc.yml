@@ -1,8 +1,8 @@
 name: test-sphinx-ci
 on:
   push:
-    branch: sphinx
-    
+    branch: [sphinx]
+
 jobs:
   doc-publishing:
     name: Build documentation and publish on gh-page
@@ -18,5 +18,10 @@ jobs:
       uses: actions/checkout@v3
       with:
         ref: ${{ github.ref }}
+    - name: Install sphinx-pyproject
+      run: >-
+        python -m
+        pip install
+        sphinx-pyproject
     - name: Deploy sphinx documentation
       uses: sphinx-notes/pages@v3
