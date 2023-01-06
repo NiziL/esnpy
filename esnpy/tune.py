@@ -6,6 +6,8 @@ from scipy.sparse import issparse
 from scipy.linalg import eigvals
 from scipy.sparse.linalg import eigs
 
+__all__ = ["Tuner", "SpectralRadiusTuner"]
+
 
 class Tuner(ABC):
     @abstractmethod

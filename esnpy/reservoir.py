@@ -1,31 +1,37 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from .type import MatrixType, VectorType
 from typing import Callable
 from .init import Initializer
 from .tune import Tuner
 
+__all__ = ["ReservoirBuilder"]
+
 
 @dataclass
-class ReservoirConfig:
-    """ """
+class ReservoirBuilder:
+    """Dataclass helper to configure and build a reservoir."""
 
     size: int
     leaky: float
-    fn: Callable
     input_size: int
-    input_bias: bool
     input_init: Initializer
-    input_tuners: list[Tuner]
     intern_init: Initializer
-    intern_tuners: list[Tuner]
+    input_bias: bool = field(default=True)
+    input_tuners: list[Tuner] = field(default_factory=lambda: [])
+    intern_tuners: list[Tuner] = field(default_factory=lambda: [])
+    fn: Callable = field(default=np.tanh)
+
+    def build(self, seed=None):
+        """Build a reservoir according to the configuration."""
+        if seed is not None:
+            np.random.seed(seed)
+        return Reservoir(self)
 
 
-class _Reservoir:
-    """Built from a ReservoirConfig"""
-
-    def __init__(self, config: ReservoirConfig):
+class Reservoir:
+    def __init__(self, config: ReservoirBuilder):
         super().__init__()
         # save parameters
         self._input_bias = config.input_bias

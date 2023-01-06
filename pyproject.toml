@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "esnpy"
-version = "0.2.1"
+version = "0.3.0"
 description = "Out-of-the-box framework for Echo State Networks"
 readme = "README.md"
 authors = [{name = "Théo BL", email = "biasutto.t@gmail.com"}]
@@ -27,7 +27,15 @@ dependencies = [
 requires-python = ">= 3.9"
 
 [project.optional-dependencies]
-dev = ["black"]
+lint = ["black", "flake8"]
+doc = ["sphinx", "sphinx-pyproject"]
 
 [project.urls]
 GitHub = "https://github.com/NiziL/esnpy"
+
+[tool.sphinx-pyproject]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode", "sphinx.ext.napoleon"]
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_STORE"]
+html_theme = "classic"
+html_static_path = ["_static"]

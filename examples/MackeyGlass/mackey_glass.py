@@ -5,6 +5,7 @@ import esnpy
 import numpy as np
 import time
 from typing import Union
+from pathlib import Path
 
 WARMUP_LEN = 100
 LEARN_LEN = 2000
@@ -13,7 +14,8 @@ ERROR_LEN = 500
 
 
 def load_data():
-    data = np.loadtxt("MackeyGlass_t17.txt")[:, None]
+    data_path = Path(__file__).parent.absolute()
+    data = np.loadtxt(data_path / "MackeyGlass_t17.txt")[:, None]
     warmup = data[:WARMUP_LEN]
     train = data[WARMUP_LEN:LEARN_LEN]
     target = data[WARMUP_LEN + 1 : LEARN_LEN + 1]
@@ -47,17 +49,14 @@ if __name__ == "__main__":
     print("ESN with a dense internal matrix")
     run(
         esnpy.ESN(
-            esnpy.ReservoirConfig(
-                input_size=1,
+            esnpy.ReservoirBuilder(
                 size=1000,
                 leaky=0.3,
-                fn=np.tanh,
-                input_bias=True,
+                input_size=1,
                 input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
-                input_tuners=[],
                 intern_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
                 intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
-            ),
+            ).build(),
             esnpy.train.RidgeTrainer(1e-8),
         )
     )
@@ -65,17 +64,14 @@ if __name__ == "__main__":
     print("ESN with a sparse internal matrix")
     run(
         esnpy.ESN(
-            esnpy.ReservoirConfig(
-                input_size=1,
+            esnpy.ReservoirBuilder(
                 size=1000,
                 leaky=0.3,
-                fn=np.tanh,
-                input_bias=True,
+                input_size=1,
                 input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
-                input_tuners=[],
                 intern_init=esnpy.init.UniformSparseInit(-0.5, 0.5, 0.01),
                 intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
-            ),
+            ).build(),
             esnpy.train.RidgeTrainer(1e-8),
         )
     )
@@ -84,45 +80,36 @@ if __name__ == "__main__":
     run(
         esnpy.DeepESN(
             [
-                esnpy.ReservoirConfig(
-                    input_size=1,
+                esnpy.ReservoirBuilder(
                     size=1024,
                     leaky=0.3,
-                    fn=np.tanh,
-                    input_bias=True,
+                    input_size=1,
                     input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
-                    input_tuners=[],
                     intern_init=esnpy.init.UniformSparseInit(
                         -0.5, 0.5, density=0.01
                     ),
                     intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
-                ),
-                esnpy.ReservoirConfig(
-                    input_size=1024,
+                ).build(),
+                esnpy.ReservoirBuilder(
                     size=512,
                     leaky=0.3,
-                    fn=np.tanh,
-                    input_bias=True,
+                    input_size=1024,
                     input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
-                    input_tuners=[],
                     intern_init=esnpy.init.UniformSparseInit(
                         -0.5, 0.5, density=0.01
                     ),
                     intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
-                ),
-                esnpy.ReservoirConfig(
-                    input_size=512,
+                ).build(),
+                esnpy.ReservoirBuilder(
                     size=128,
                     leaky=0.3,
-                    fn=np.tanh,
-                    input_bias=True,
+                    input_size=512,
                     input_init=esnpy.init.UniformDenseInit(-0.5, 0.5),
-                    input_tuners=[],
                     intern_init=esnpy.init.UniformSparseInit(
                         -0.5, 0.5, density=0.01
                     ),
                     intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
-                ),
+                ).build(),
             ],
             trainer=esnpy.train.RidgeTrainer(1e-8),
             # only use the two last reservoirs for training

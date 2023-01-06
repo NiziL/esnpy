@@ -3,10 +3,12 @@ import numpy as np
 from abc import ABC, abstractmethod
 from .train import Trainer
 from .type import MatrixType
-from .reservoir import ReservoirConfig, _Reservoir
+from .reservoir import ReservoirBuilder, Reservoir
+
+__all__ = ["ESN", "DeepESN"]
 
 
-class _BaseESN(ABC):
+class BaseESN(ABC):
     def __init__(self, trainer: Trainer):
         super().__init__()
         self._trainer = trainer
@@ -38,12 +40,12 @@ class _BaseESN(ABC):
         return np.hstack(inputs).dot(self._Wout)
 
 
-class ESN(_BaseESN):
-    """ """
+class ESN(BaseESN):
+    """Echo State Network implementation."""
 
-    def __init__(self, config: ReservoirConfig, trainer: Trainer):
+    def __init__(self, reservoir: Reservoir, trainer: Trainer):
         super().__init__(trainer)
-        self._reservoir = _Reservoir(config)
+        self._reservoir = reservoir
 
     def _warmup(self, data: MatrixType):
         self._reservoir(data)
@@ -52,17 +54,17 @@ class ESN(_BaseESN):
         return self._reservoir(data)
 
 
-class DeepESN(_BaseESN):
-    """ """
+class DeepESN(BaseESN):
+    """DeepESN implementation."""
 
     def __init__(
         self,
-        configs: list[ReservoirConfig],
+        reservoirs: list[ReservoirBuilder],
         trainer: Trainer,
         mask: list[bool] = None,
     ):
         super().__init__(trainer)
-        self._reservoirs = [_Reservoir(cfg) for cfg in configs]
+        self._reservoirs = reservoirs
         if mask is None:
             self._mask = [True] * len(self._reservoirs)
         else:

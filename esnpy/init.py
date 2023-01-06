@@ -4,6 +4,15 @@ from .type import MatrixType, VectorType
 import numpy as np
 import scipy
 
+__all__ = [
+    "Initializer",
+    "UniformDenseInit",
+    "NormalDenseInit",
+    "SparseInitializer",
+    "UniformSparseInit",
+    "NormalSparseInit",
+]
+
 
 def _uniform(shape, bmin, bmax):
     return np.random.rand(*shape).dot(bmax - bmin) + bmin
