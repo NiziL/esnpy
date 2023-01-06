@@ -6,6 +6,8 @@ Models have been implemented in pure NumPy/SciPy, so there is no need for a powe
 Right now, the focus is on batch training, and feedback loops have not been taken into account.  
 But feel free to open a ticket a discuss about anything you need, features you want, or even help !
 
+The documentation for the latest release is available on [the github page](https://nizil.github.io/esnpy).
+
 Note from the author: *`esnpy` is a small projet I initiated during my master intership, and have recently cleaned up. I might keep working on it for fun, but If you want/need a more robust framework, [ReservoirPy](https://github.com/reservoirpy/reservoirpy) might be the one you're searching for ;)*
 
 ## Getting Started
