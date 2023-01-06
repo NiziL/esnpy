@@ -27,7 +27,8 @@ dependencies = [
 requires-python = ">= 3.9"
 
 [project.optional-dependencies]
-dev = ["flake8", "black", "sphinx", "sphinx-pyproject"]
+lint = ["black", "flake8"]
+doc = ["sphinx", "sphinx-pyproject"]
 
 [project.urls]
 GitHub = "https://github.com/NiziL/esnpy"

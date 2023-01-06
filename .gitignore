@@ -1,6 +1,11 @@
+# vim
+*.swp
+# pycache
+__pycache__/
+*.pyc
+# pip build
 build/
 dist/
 *.egg-info/
-*.swp
-*.pyc
-__pycache__/
+# sphinx build
+docs/_build/
