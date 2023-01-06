@@ -1,4 +1,4 @@
-esnpy package
+esnpy package 
 =============
 
 .. automodule:: esnpy
