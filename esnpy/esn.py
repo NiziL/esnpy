@@ -2,13 +2,13 @@
 import numpy as np
 from abc import ABC, abstractmethod
 from .train import Trainer
-from ._type import MatrixType
+from .type import MatrixType
 from .reservoir import ReservoirConfig, Reservoir
 
 __all__ = ["ESN", "DeepESN"]
 
 
-class _BaseESN(ABC):
+class BaseESN(ABC):
     def __init__(self, trainer: Trainer):
         super().__init__()
         self._trainer = trainer
@@ -40,7 +40,7 @@ class _BaseESN(ABC):
         return np.hstack(inputs).dot(self._Wout)
 
 
-class ESN(_BaseESN):
+class ESN(BaseESN):
     """ """
 
     def __init__(self, reservoir: Reservoir, trainer: Trainer):
@@ -54,7 +54,7 @@ class ESN(_BaseESN):
         return self._reservoir(data)
 
 
-class DeepESN(_BaseESN):
+class DeepESN(BaseESN):
     """ """
 
     def __init__(
