@@ -49,7 +49,7 @@ if __name__ == "__main__":
     print("ESN with a dense internal matrix")
     run(
         esnpy.ESN(
-            esnpy.ReservoirConfig(
+            esnpy.ReservoirBuilder(
                 size=1000,
                 leaky=0.3,
                 input_size=1,
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     print("ESN with a sparse internal matrix")
     run(
         esnpy.ESN(
-            esnpy.ReservoirConfig(
+            esnpy.ReservoirBuilder(
                 size=1000,
                 leaky=0.3,
                 input_size=1,
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     run(
         esnpy.DeepESN(
             [
-                esnpy.ReservoirConfig(
+                esnpy.ReservoirBuilder(
                     size=1024,
                     leaky=0.3,
                     input_size=1,
@@ -90,7 +90,7 @@ if __name__ == "__main__":
                     ),
                     intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
                 ).build(),
-                esnpy.ReservoirConfig(
+                esnpy.ReservoirBuilder(
                     size=512,
                     leaky=0.3,
                     input_size=1024,
@@ -100,7 +100,7 @@ if __name__ == "__main__":
                     ),
                     intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.25)],
                 ).build(),
-                esnpy.ReservoirConfig(
+                esnpy.ReservoirBuilder(
                     size=128,
                     leaky=0.3,
                     input_size=512,

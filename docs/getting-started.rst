@@ -21,12 +21,12 @@ Here is a minimal example
 
     import esnpy
 
-    config = createConfig()
+    reservoir_builder = createBuilder()
     trainer = createTrainer()
     warmup, data, target = loadData()
 
     # create the echo state network
-    esn = esnpy.ESN(config.build(), trainer)
+    esn = esnpy.ESN(reservoir_builder.build(), trainer)
     # train it
     esn.fit(warmup, data, target)
     # test it
@@ -46,11 +46,11 @@ The constructor needs a `esnpy.Reservoir` and an implementation of `esnpy.train.
 Then, simply call `fit` function by passing some warm up and training data with the related targets.  
 Once trained, run predictions using `transform`.
 
-**Reservoir and ReservoirConfig**
+**Reservoir and ReservoirBuilder**
 
-A `Reservoir` can easily be initialized using the `ReservoirConfig` dataclass.  
+A `Reservoir` can easily be initialized using the `ReservoirBuilder` dataclass.  
 For convenience, the configuration class is also a builder, exposing a `build()` method.
-This method has an optional `seed` parameter used to make deterministic initialization, and so to ease the comparaison of two identical reservoirs
+This method has an optional `seed` parameter used to make deterministic initialization, and so to ease the comparaison of two identical reservoirs.
 
 **Initializer and Tuner**
 

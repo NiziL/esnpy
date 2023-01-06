@@ -6,12 +6,12 @@ from typing import Callable
 from .init import Initializer
 from .tune import Tuner
 
-__all__ = ["ReservoirConfig", "Reservoir"]
+__all__ = ["ReservoirBuilder"]
 
 
 @dataclass
-class ReservoirConfig:
-    """ """
+class ReservoirBuilder:
+    """Dataclass helper to configure and build a reservoir."""
 
     size: int
     leaky: float
@@ -24,15 +24,14 @@ class ReservoirConfig:
     fn: Callable = field(default=np.tanh)
 
     def build(self, seed=None):
+        """Build a reservoir according to the configuration."""
         if seed is not None:
             np.random.seed(seed)
         return Reservoir(self)
 
 
 class Reservoir:
-    """Built from a ReservoirConfig"""
-
-    def __init__(self, config: ReservoirConfig):
+    def __init__(self, config: ReservoirBuilder):
         super().__init__()
         # save parameters
         self._input_bias = config.input_bias

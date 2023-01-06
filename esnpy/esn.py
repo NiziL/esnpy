@@ -3,7 +3,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 from .train import Trainer
 from .type import MatrixType
-from .reservoir import ReservoirConfig, Reservoir
+from .reservoir import ReservoirBuilder, Reservoir
 
 __all__ = ["ESN", "DeepESN"]
 
@@ -41,7 +41,7 @@ class BaseESN(ABC):
 
 
 class ESN(BaseESN):
-    """ """
+    """Echo State Network implementation."""
 
     def __init__(self, reservoir: Reservoir, trainer: Trainer):
         super().__init__(trainer)
@@ -55,11 +55,11 @@ class ESN(BaseESN):
 
 
 class DeepESN(BaseESN):
-    """ """
+    """DeepESN implementation."""
 
     def __init__(
         self,
-        reservoirs: list[ReservoirConfig],
+        reservoirs: list[ReservoirBuilder],
         trainer: Trainer,
         mask: list[bool] = None,
     ):
