@@ -90,8 +90,8 @@ This trainer has three parameters : one float, the regularization parameter's we
 ## Code Examples 
 
 Want to see some code in action ? Take a look at the `examples/` directory:
-- `MackeyGlass/` demonstrates how to learn to predict a time series
-- `TrajectoryClassification/` demonstrates how to learn to classify 2D trajectories
+- `MackeyGlass/` demonstrates how to learn to predict a time series,
+- `TrajectoryClassification/` demonstrates how to learn to classify 2D trajectories.
 
 ## Bibliography
 
