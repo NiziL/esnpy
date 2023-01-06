@@ -8,6 +8,7 @@ __all__ = [
     "Initializer",
     "UniformDenseInit",
     "NormalDenseInit",
+    "SparseInitializer",
     "UniformSparseInit",
     "NormalSparseInit",
 ]
