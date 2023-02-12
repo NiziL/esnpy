@@ -81,10 +81,12 @@ This method has an optional `seed` parameter used to make deterministic initiali
 `Tuner` is defined by a `init(matrix : Matrix) -> Matrix` function, which can be used to modify the weights after initialization.
 For example, `esnpy` provides a `SpectralRadiusTuner` to change the spectral radius of a weights matrix.
 
-#### `Trainer`
+#### `Trainer` and `Reader`
 
 `esnpy.train.Trainer` is responsible to create the output weights matrix from the training data and targets.  
-It is defined by a `train(inputs: Matrix, data: Matrix, target: Matrix) -> Matrix` function.
+It is defined by a `train(inputs: Matrix, data: Matrix, target: Matrix) -> Reader` function.
+
+The `Reader` is then responsible for computing the final result from the reservoir activations through `__call__`.
 
 `esnpy` provides a `RidgeTrainer` to compute the output weights using a ridge regression. 
 This trainer has three parameters : one float, the regularization parameter's weight `alpha`, and two optionals boolean (default to true) `use_bias` and `use_input` to control if we should use a bias and the input to compute the readout weights.

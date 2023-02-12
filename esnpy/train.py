@@ -1,16 +1,29 @@
 # -*- coding: utf-8 -*-
 from abc import ABC, abstractmethod
-from .type import MatrixType
 import numpy as np
 from scipy import linalg
+from .type import MatrixType
+from .reader import MatrixReader, SklearnReader
 
 __all__ = ["Trainer", "RidgeTrainer"]
 
 
 class Trainer(ABC):
-    @abstractmethod
     def train(
-        self, data: MatrixType, states: MatrixType, target: MatrixType
+        self, inputs: MatrixType, states: MatrixType, target: MatrixType
+    ) -> MatrixType:
+        data = []
+        if self._bias:
+            data.append(np.ones((states.shape[0], 1)))
+        if self._input:
+            data.append(inputs)
+        data.append(states)
+        data = np.hstack(data)
+        return self.compute_readout(data, target)
+
+    @abstractmethod
+    def compute_readout(
+        self, data: MatrixType, target: MatrixType
     ) -> MatrixType:
         pass
 
@@ -40,17 +53,12 @@ class RidgeTrainer(Trainer):
     def use_input(self):
         return self._input
 
-    def train(
-        self, inputs: MatrixType, states: MatrixType, target: MatrixType
+    def compute_readout(
+        self, data: MatrixType, target: MatrixType
     ) -> MatrixType:
-        data = []
-        if self._bias:
-            data.append(np.ones((states.shape[0], 1)))
-        if self._input:
-            data.append(inputs)
-        data.append(states)
-        data = np.hstack(data)
-        return linalg.solve(
-            np.dot(data.T, data) + self._alpha * np.eye(data.shape[1]),
-            np.dot(data.T, target),
+        return MatrixReader(
+            linalg.solve(
+                data.T @ data + self._alpha * np.eye(data.shape[1]),
+                data.T @ target,
+            )
         )
