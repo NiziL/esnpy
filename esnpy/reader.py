@@ -16,3 +16,12 @@ class MatrixReader(Reader):
 
     def __call__(self, data: MatrixType) -> MatrixType:
         return data @ self._Wout
+
+
+class SklearnReader(Reader):
+    def __init__(self, model):
+        super().__init__()
+        self._model = model
+
+    def __call__(self, data: MatrixType) -> MatrixType:
+        return self._model.predict(data)

@@ -62,3 +62,25 @@ class RidgeTrainer(Trainer):
                 data.T @ target,
             )
         )
+
+
+class SklearnTrainer(Trainer):
+    def __init__(self, sklearn_model, use_bias: bool = True, use_input=True):
+        super().__init__()
+        self._model = sklearn_model
+        self._bias = use_bias
+        self._input = use_input
+
+    @property
+    def use_bias(self):
+        return self._bias
+
+    @property
+    def use_input(self):
+        return self._input
+
+    def compute_readout(
+        self, data: MatrixType, target: MatrixType
+    ) -> MatrixType:
+        self._model.fit(data, target)
+        return SklearnReader(self._model)
