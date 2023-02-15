@@ -51,7 +51,7 @@ class Reservoir:
             self._W = tuner.tune(self._W)
 
     def __update(self, vector: VectorType) -> MatrixType:
-        update = vector.dot(self._Win) + self._W.dot(self._state)
+        update = vector @ self._Win + self._W @ self._state
         self._state = self._a * self._fn(update) + (1 - self._a) * self._state
         return self._state
 

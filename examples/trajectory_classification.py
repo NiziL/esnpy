@@ -3,6 +3,7 @@
 import numpy as np
 import esnpy
 import time
+from sklearn import linear_model, tree
 
 
 def class1(t, beta):
@@ -55,24 +56,25 @@ def main():
     test_data, test_target = prepare_data(50)
     print("ok")
 
-    print("Creating the ESN...", end=" ")
-    esn = esnpy.ESN(
-        esnpy.ReservoirBuilder(
-            size=512,
-            leaky=0.8,
-            fn=np.tanh,
-            input_size=2,
-            input_bias=True,
-            input_init=esnpy.init.UniformDenseInit(-2, 2),
-            input_tuners=[],
-            intern_init=esnpy.init.NormalSparseInit(0, 1, density=0.01),
-            intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.3)],
-        ).build(),
-        esnpy.train.RidgeTrainer(1e-8),
-    )
+    print("Creating the reservoir...", end=" ")
+    reservoir = esnpy.ReservoirBuilder(
+        size=512,
+        leaky=0.8,
+        fn=np.tanh,
+        input_size=2,
+        input_bias=True,
+        input_init=esnpy.init.UniformDenseInit(-2, 2),
+        input_tuners=[],
+        intern_init=esnpy.init.NormalSparseInit(0, 1, density=0.01),
+        intern_tuners=[esnpy.tune.SpectralRadiusTuner(1.3)],
+    ).build()
     print("ok")
 
-    print("Training...", end=" ")
+    print("Training with RidgeTrainer...", end=" ")
+    esn = esnpy.ESN(
+        reservoir,
+        esnpy.train.RidgeTrainer(1e-8),
+    )
     start = time.perf_counter_ns()
     esn.fit(warmup_data, learn_data, learn_target)
     end = time.perf_counter_ns()
@@ -82,6 +84,22 @@ def main():
     pred = esn.transform(test_data)
     pred = np.rint(pred).clip(0, 2)
 
+    acc = (pred == test_target).mean()
+    print(f"Average accuracy: {acc:0.2f}")
+
+    print("Training with sklearn...")
+    esn = esnpy.ESN(
+        reservoir,
+        esnpy.train.SklearnTrainer(linear_model.RidgeClassifier(alpha=1e-8)),
+    )
+    start = time.perf_counter_ns()
+    esn.fit(warmup_data, learn_data, learn_target)
+    end = time.perf_counter_ns()
+    print(f"done in {(end - start) / 1e6}ms")
+
+    print("Testing...", end=" ")
+    pred = esn.transform(test_data)
+    pred = pred.reshape(-1, 1)
     acc = (pred == test_target).mean()
     print(f"Average accuracy: {acc:0.2f}")
 
