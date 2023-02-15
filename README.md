@@ -88,8 +88,10 @@ It is defined by a `train(inputs: Matrix, data: Matrix, target: Matrix) -> Reade
 
 The `Reader` is then responsible for computing the final result from the reservoir activations through `__call__`.
 
-`esnpy` provides a `RidgeTrainer` to compute the output weights using a ridge regression. 
+`esnpy` provides a `RidgeTrainer` to compute the output weights using a ridge regression, and a `SklearnTrainer` (more on this one later). 
 This trainer has three parameters : one float, the regularization parameter's weight `alpha`, and two optionals boolean (default to true) `use_bias` and `use_input` to control if we should use a bias and the input to compute the readout weights.
+
+`SklearnTrainer` is an adapter wrapping scikit-learn model, relying on methods `fit` and `predict`. The feature is still experimental, chaos might ensure. 
 
 ## Code Examples 
 
