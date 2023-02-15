@@ -5,7 +5,7 @@ from scipy import linalg
 from .type import MatrixType
 from .reader import MatrixReader, SklearnReader
 
-__all__ = ["Trainer", "RidgeTrainer"]
+__all__ = ["Trainer", "RidgeTrainer", "SklearnTrainer"]
 
 
 class Trainer(ABC):
