@@ -6,6 +6,8 @@ Models have been implemented in pure NumPy/SciPy, so there is no need for a powe
 Right now, the focus is on batch training, and feedback loops have not been taken into account.  
 But feel free to open a ticket a discuss about anything you need, features you want, or even help !
 
+The documentation for the latest release is available on [the github page](https://nizil.github.io/esnpy).
+
 Note from the author: *`esnpy` is a small projet I initiated during my master intership, and have recently cleaned up. I might keep working on it for fun, but If you want/need a more robust framework, [ReservoirPy](https://github.com/reservoirpy/reservoirpy) might be the one you're searching for ;)*
 
 ## Getting Started
@@ -79,19 +81,23 @@ This method has an optional `seed` parameter used to make deterministic initiali
 `Tuner` is defined by a `init(matrix : Matrix) -> Matrix` function, which can be used to modify the weights after initialization.
 For example, `esnpy` provides a `SpectralRadiusTuner` to change the spectral radius of a weights matrix.
 
-#### `Trainer`
+#### `Trainer` and `Reader`
 
 `esnpy.train.Trainer` is responsible to create the output weights matrix from the training data and targets.  
-It is defined by a `train(inputs: Matrix, data: Matrix, target: Matrix) -> Matrix` function.
+It is defined by a `train(inputs: Matrix, data: Matrix, target: Matrix) -> Reader` function.
 
-`esnpy` provides a `RidgeTrainer` to compute the output weights using a ridge regression. 
+The `Reader` is then responsible for computing the final result from the reservoir activations through `__call__`.
+
+`esnpy` provides a `RidgeTrainer` to compute the output weights using a ridge regression, and a `SklearnTrainer` (more on this one later). 
 This trainer has three parameters : one float, the regularization parameter's weight `alpha`, and two optionals boolean (default to true) `use_bias` and `use_input` to control if we should use a bias and the input to compute the readout weights.
+
+`SklearnTrainer` is an adapter wrapping scikit-learn model, relying on methods `fit` and `predict`. The feature is still experimental, chaos might ensure. 
 
 ## Code Examples 
 
 Want to see some code in action ? Take a look at the `examples/` directory:
-- `MackeyGlass/` demonstrates how to learn to predict a time series,
-- `TrajectoryClassification/` demonstrates how to learn to classify 2D trajectories.
+- `mackey_glass.py` demonstrates how to learn to predict a time series,
+- `trajectory_classification/` demonstrates how to learn to classify 2D trajectories.
 
 ## Bibliography
 

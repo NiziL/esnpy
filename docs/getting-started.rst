@@ -5,10 +5,14 @@ Installation
 ------------
 
 You can install `esnpy` using `pip`.
+
 Either from PyPI:
-`pip install esnpy` 
+
+    pip install esnpy
+
 Or from GitHub:
-`pip install git+https://github.com/NiziL/esnpy#egg=esnpy`
+
+    pip install git+https://github.com/NiziL/esnpy#egg=esnpy
 
 Quickstart
 ----------

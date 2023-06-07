@@ -12,7 +12,7 @@ class BaseESN(ABC):
     def __init__(self, trainer: Trainer):
         super().__init__()
         self._trainer = trainer
-        self._Wout = None
+        self._reader = None
 
     @abstractmethod
     def _warmup(self, data: MatrixType):
@@ -25,10 +25,10 @@ class BaseESN(ABC):
     def fit(self, warmup: MatrixType, data: MatrixType, target: MatrixType):
         self._warmup(warmup)
         states = self._forward(data)
-        self._Wout = self._trainer.train(data, states, target)
+        self._reader = self._trainer.train(data, states, target)
 
     def transform(self, data: MatrixType) -> MatrixType:
-        if self._Wout is None:
+        if self._reader is None:
             raise RuntimeError("Don't call transform before fit !")
         states = self._forward(data)
         inputs = []
@@ -37,7 +37,7 @@ class BaseESN(ABC):
         if self._trainer.use_input:
             inputs.append(data)
         inputs.append(states)
-        return np.hstack(inputs).dot(self._Wout)
+        return self._reader(np.hstack(inputs))
 
 
 class ESN(BaseESN):
