@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "esnpy"
-version = "0.3.0"
+version = "0.4.0"
 description = "Out-of-the-box framework for Echo State Networks"
 readme = "README.md"
 authors = [{name = "Théo BL", email = "biasutto.t@gmail.com"}]
